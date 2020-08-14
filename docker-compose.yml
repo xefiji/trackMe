@@ -1,7 +1,7 @@
 version: "3.3"
 
 services:
-    site:
+    trackme:
         build: 
             context: .
         volumes:
@@ -11,7 +11,7 @@ services:
         labels:
             - "traefik.docker.network=proxy"
             - "traefik.enable=true"
-            - "traefik.http.routers.site.rule=Host(`${DOMAIN}`)"           
+            - "traefik.http.routers.trackme.rule=Host(`${DOMAIN}`)"           
             
 networks:
   proxy:
