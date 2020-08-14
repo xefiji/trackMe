@@ -1,0 +1,18 @@
+version: "3.3"
+
+services:
+    site:
+        build: 
+            context: .
+        volumes:
+            - .:/usr/share/nginx/html
+        networks:
+            - proxy
+        labels:
+            - "traefik.docker.network=proxy"
+            - "traefik.enable=true"
+            - "traefik.http.routers.site.rule=Host(`${DOMAIN}`)"           
+            
+networks:
+  proxy:
+    external: true
