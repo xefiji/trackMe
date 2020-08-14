@@ -22,3 +22,7 @@ yarn lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+### Example
+
+![screenshot of some points](screenshot.png)
