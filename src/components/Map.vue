@@ -43,6 +43,15 @@
         <l-popup :content="marker.tooltip" />
         <l-tooltip :content="marker.tooltip" />
       </l-marker>
+      <l-polyline
+        v-for="item in polylines"
+        :key="item.id"
+        :lat-lngs="item.points"      
+        :opacity="item.opacity"
+        :visible="item.visible"
+        :dashArray="item.dashArray"
+        @click="alert(item)"
+      />
     </l-map>
 
   </div>
@@ -59,7 +68,8 @@ import {
   LControlZoom,
   LControlAttribution,
   LControlScale,
-  LControlLayers
+  LControlLayers,
+  LPolyline
 } from 'vue2-leaflet';
 
 const axios = require('axios');
@@ -88,12 +98,13 @@ export default {
     LMap,
     LTileLayer,
     LMarker,
-    LTooltip,
+    LTooltip,    
     LPopup,
     LControlZoom,
     LControlAttribution,
     LControlScale,
     LControlLayers,
+    LPolyline
   },
   mounted: function(){
     this.getMarkers();
@@ -118,6 +129,7 @@ export default {
       imperial: false,      
       tileProviders: tileProviders,
       markers: [],
+      polylines: [],
       bounds: null
     };
   },
@@ -125,29 +137,36 @@ export default {
     alert(item) {
       alert('this is ' + JSON.stringify(item));
     },
-    getMarkers: function(){
+    getMarkers: async function(){
       var url = process.env.VUE_APP_API;
       var day = moment().format('YYYY-MM-DD');  //todo as arg      
       var m = [];
-      axios      
+      var p = [];
+      await axios      
       .get(url + '?day=' + day)
       .then(function(response){              
         response.data.forEach(function(pos, k){
             m.push({
               id: pos.origin + '_' + k,
-              tooltip: "<ul><li>date: " + pos.at + "</li><li>" + "alt: " + pos.alt + "</li><li>" + "volts: " + pos.batt + "</li></ul>",
+              tooltip: "<ul><li>lat: " + pos.lat +"</li><li>long: " + pos.lon +"</li><li>date: " + pos.at + "</li><li>" + "alt: " + pos.alt + "</li><li>" + "volts: " + pos.batt + "</li></ul>",
               position: { "lat": pos.lat, "lng": pos.lon },
-
             })
+            p.push([pos.lat, pos.lon])
         });  
       });
-
+    
       this.markers = m;                 
-      this.bounds =  latLngBounds([
-        [43.70081290280357, 5.26963806152345],
-        [45.82991732677597, 5.08716201782228]
-      ]);
-    }    
+      this.polylines = [{
+          id: "poly",
+          points: p,
+          opacity: 0.75,
+          color: 'green',
+          dashArray: "5,10"
+
+      }];
+
+      this.bounds = latLngBounds(m.map(o => o.position));    
+    },
   },
 };
 </script>
